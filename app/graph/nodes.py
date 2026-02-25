@@ -11,7 +11,10 @@ def _rid(state):
 def supervisor_node(state):
     logger.info("request_id=%s | node=supervisor | enter", _rid(state))
 
-    state.intent = classify_intent(state.user_input)
+    state.intent = classify_intent(
+        state.user_input,
+        has_uploaded_file=bool(getattr(state, "uploaded_file", None)),
+    )
     logger.info(
         "request_id=%s | node=supervisor | exit | routed_intent=%s",
         _rid(state),

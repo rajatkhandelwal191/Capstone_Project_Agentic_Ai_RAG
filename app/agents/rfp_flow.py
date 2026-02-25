@@ -31,34 +31,61 @@ def _read_pdf_text(file_path, max_chars=12000):
         return "", 0
 
 
+def _should_use_uploaded_context(user_input: str, has_uploaded_file: bool) -> bool:
+    if not has_uploaded_file:
+        return False
+
+    text = user_input.lower()
+    doc_keywords = (
+        "uploaded",
+        "document",
+        "pdf",
+        "file",
+        "summarize",
+        "analyze",
+        "this client proposal",
+    )
+    return any(keyword in text for keyword in doc_keywords)
+
+
 def run_rfp_flow(state):
     request_id = getattr(state, "request_id", None) or "no-request-id"
     start = time.perf_counter()
-    if not state.uploaded_file:
-        state.needs_upload = True
-        state.response = "Please upload your RFP PDF first, then ask your RFP question."
-        logger.info("request_id=%s | agent=rfp_flow | blocked | reason=no_uploaded_file", request_id)
-        return state
+    has_uploaded_file = bool(state.uploaded_file)
+    use_uploaded_context = _should_use_uploaded_context(state.user_input, has_uploaded_file)
+    rfp_text = ""
+    page_count = 0
 
-    logger.info("request_id=%s | agent=rfp_flow | start | file=%s", request_id, state.uploaded_file)
-    rfp_text, page_count = _read_pdf_text(state.uploaded_file)
     logger.info(
-        "request_id=%s | agent=rfp_flow | extracted_pdf | pages_read=%s | chars=%s",
+        "request_id=%s | agent=rfp_flow | start | has_uploaded_file=%s | use_uploaded_context=%s",
         request_id,
-        page_count,
-        len(rfp_text),
+        has_uploaded_file,
+        use_uploaded_context,
     )
 
-    prompt = f"""
-You are drafting an enterprise RFP response.
+    if use_uploaded_context:
+        rfp_text, page_count = _read_pdf_text(state.uploaded_file)
+        logger.info(
+            "request_id=%s | agent=rfp_flow | extracted_pdf | pages_read=%s | chars=%s",
+            request_id,
+            page_count,
+            len(rfp_text),
+        )
 
-RFP Document Content:
-{rfp_text if rfp_text else "No readable content found in the uploaded file."}
+    prompt = f"""
+You are an enterprise proposal writer.
+
+Task:
+- Draft a professional enterprise-style proposal response for the user request.
+- If details are missing, make practical assumptions and include a short "Clarifications Needed" section.
+- Keep output structured with headings and bullet points where useful.
+- If expected output asks for enterprise-style proposal text, produce exactly that style.
+
+Uploaded Document Context (use only when relevant):
+{rfp_text if use_uploaded_context and rfp_text else "No uploaded document context used."}
 
 User Request:
 {state.user_input}
-
-Return a concise, professional response with clear sections and actionable details.
 """
 
     state.response = llm.invoke(prompt).content

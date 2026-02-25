@@ -1,5 +1,5 @@
 {
-  "supervisor": "Classify user intent into RFP_FLOW, TOOL_FLOW, or RAG_FLOW. Return ONLY one label.",
+  "supervisor": "Classify user intent into RFP_FLOW, TOOL_FLOW, RAG_FLOW, or UPLOAD_FLOW. Return ONLY one label.",
   "rag": "Answer using context only.",
   "rfp": "You are an enterprise proposal writer."
 }
