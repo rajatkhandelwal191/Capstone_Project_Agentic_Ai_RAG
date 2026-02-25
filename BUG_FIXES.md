@@ -20,3 +20,11 @@ This file tracks bugs fixed in this project with short notes.
   - Added service request repository/tool functions.
   - Added routing hints for `request`/`requests`.
   - Added `show open requests` support using DB-backed open service requests output.
+- Fixed chat UX delay where user messages only appeared after assistant response:
+  - Rendered user chat bubble immediately on submit in `app/ui/streamlit_app.py`.
+- Fixed RFP upload UX where uploader disappeared before file selection:
+  - Moved uploader to persistent session-driven UI state (`awaiting_upload`) in `app/ui/streamlit_app.py`.
+- Fixed RFP flow not using uploaded file:
+  - Wired uploaded file path from Streamlit session into graph state.
+  - Added PDF text extraction in `app/agents/rfp_flow.py` and included extracted content in the RFP prompt.
+  - Added guard response when RFP flow is called before upload.

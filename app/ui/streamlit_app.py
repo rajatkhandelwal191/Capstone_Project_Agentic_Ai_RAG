@@ -23,6 +23,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "assistant", "content": "How may I assist you?"}
     ]
+if "awaiting_upload" not in st.session_state:
+    st.session_state.awaiting_upload = False
+if "uploaded_file" not in st.session_state:
+    st.session_state.uploaded_file = None
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
@@ -34,34 +38,51 @@ if user_input:
     st.session_state.messages.append(
         {"role":"user","content":user_input}
     )
+    st.chat_message("user").write(user_input)
 
-    state = GraphState(user_input=user_input)
+    assistant_box = st.chat_message("assistant")
+    with assistant_box:
+        with st.spinner("Thinking..."):
+            state = GraphState(
+                user_input=user_input,
+                uploaded_file=st.session_state.uploaded_file
+            )
 
-    result = graph.invoke(state)
+            result = graph.invoke(state)
 
-    if _state_get(result, "needs_upload", False):
-
-        uploaded = st.file_uploader(
-            "Upload RFP PDF",
-            type=["pdf"]
-        )
-
-        if uploaded:
-
-            upload_dir = PROJECT_ROOT / "temp_uploads"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-            path = upload_dir / uploaded.name
-
-            with open(path, "wb") as f:
-                f.write(uploaded.getbuffer())
-
-            st.success("File uploaded successfully.")
+    st.session_state.awaiting_upload = _state_get(result, "needs_upload", False)
+    assistant_response = _state_get(result, "response", "No response generated.")
+    assistant_box.write(assistant_response)
 
     st.session_state.messages.append(
         {
             "role": "assistant",
-            "content": _state_get(result, "response", "No response generated."),
+            "content": assistant_response,
         }
     )
 
-    st.rerun()
+if st.session_state.awaiting_upload:
+    uploaded = st.file_uploader(
+        "Upload RFP PDF",
+        type=["pdf"],
+        key="rfp_pdf_uploader"
+    )
+
+    if uploaded:
+        upload_dir = PROJECT_ROOT / "temp_uploads"
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        path = upload_dir / uploaded.name
+
+        with open(path, "wb") as f:
+            f.write(uploaded.getbuffer())
+
+        st.session_state.uploaded_file = str(path)
+        st.session_state.awaiting_upload = False
+        st.session_state.pop("rfp_pdf_uploader", None)
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": f"Uploaded `{uploaded.name}` successfully. Ask your RFP question now."
+            }
+        )
+        st.rerun()
