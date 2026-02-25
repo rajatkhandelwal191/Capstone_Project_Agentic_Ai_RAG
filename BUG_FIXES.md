@@ -28,3 +28,6 @@ This file tracks bugs fixed in this project with short notes.
   - Wired uploaded file path from Streamlit session into graph state.
   - Added PDF text extraction in `app/agents/rfp_flow.py` and included extracted content in the RFP prompt.
   - Added guard response when RFP flow is called before upload.
+- Fixed missing backend visibility in terminal while using Streamlit:
+  - Added explicit stdout logger setup in `app/core/logger.py`.
+  - Added request, routing, and flow lifecycle logs across UI/graph/agent layers.

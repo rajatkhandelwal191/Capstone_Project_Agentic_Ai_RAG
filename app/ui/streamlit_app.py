@@ -8,6 +8,7 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 from app.graph.graph import build_graph
 from app.graph.state import GraphState
+from app.core.logger import logger
 
 graph = build_graph()
 
@@ -34,6 +35,7 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Ask something...")
 
 if user_input:
+    logger.info("Incoming user message: %s", user_input)
 
     st.session_state.messages.append(
         {"role":"user","content":user_input}
@@ -50,6 +52,11 @@ if user_input:
 
             result = graph.invoke(state)
 
+    logger.info(
+        "Graph completed. intent=%s needs_upload=%s",
+        _state_get(result, "intent", None),
+        _state_get(result, "needs_upload", False),
+    )
     st.session_state.awaiting_upload = _state_get(result, "needs_upload", False)
     assistant_response = _state_get(result, "response", "No response generated.")
     assistant_box.write(assistant_response)
@@ -69,6 +76,7 @@ if st.session_state.awaiting_upload:
     )
 
     if uploaded:
+        logger.info("Received uploaded PDF: %s", uploaded.name)
         upload_dir = PROJECT_ROOT / "temp_uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
         path = upload_dir / uploaded.name

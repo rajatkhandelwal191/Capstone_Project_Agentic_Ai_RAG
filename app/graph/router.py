@@ -1,5 +1,6 @@
 from app.core.llm import get_llm
 from app.prompts.prompt_loader import load_prompts
+from app.core.logger import logger
 
 prompts = load_prompts()
 llm = get_llm()
@@ -51,12 +52,16 @@ def classify_intent(user_input: str):
 
     # Deterministic routing for high-confidence user intents.
     if "upload" in text:
+        logger.info("Intent classified deterministically: UPLOAD_FLOW")
         return "UPLOAD_FLOW"
     if has_tool_hint and not has_rfp_hint:
+        logger.info("Intent classified deterministically: TOOL_FLOW")
         return "TOOL_FLOW"
     if has_rfp_hint and not has_tool_hint:
+        logger.info("Intent classified deterministically: RFP_FLOW")
         return "RFP_FLOW"
     if not has_tool_hint and not has_rfp_hint:
+        logger.info("Intent classified deterministically: RAG_FLOW")
         return "RAG_FLOW"
 
     prompt = f"""
@@ -66,4 +71,6 @@ User: {user_input}
 """
 
     result = llm.invoke(prompt).content
-    return _normalize_label(result)
+    normalized = _normalize_label(result)
+    logger.info("Intent classified by LLM: %s", normalized)
+    return normalized

@@ -1,5 +1,6 @@
 from app.core.llm import get_llm
 from pypdf import PdfReader
+from app.core.logger import logger
 
 llm = get_llm()
 
@@ -31,8 +32,10 @@ def run_rfp_flow(state):
     if not state.uploaded_file:
         state.needs_upload = True
         state.response = "Please upload your RFP PDF first, then ask your RFP question."
+        logger.info("RFP flow blocked: no uploaded file present")
         return state
 
+    logger.info("RFP flow started with file: %s", state.uploaded_file)
     rfp_text = _read_pdf_text(state.uploaded_file)
 
     prompt = f"""
@@ -48,4 +51,5 @@ Return a concise, professional response with clear sections and actionable detai
 """
 
     state.response = llm.invoke(prompt).content
+    logger.info("RFP flow completed")
     return state
