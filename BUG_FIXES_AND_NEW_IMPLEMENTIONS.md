@@ -1,8 +1,10 @@
-# Bug Fixes Log
+# Bug Fixes and New Implementions
 
-This file tracks bugs fixed in this project with short notes.
+This file tracks bug fixes and new implementations in this project with short notes.
 
 ## 2026-02-25
+
+### Bug Fixes
 
 - Fixed package/interpreter mismatch: project dependencies worked in Poetry env but not global Python.
 - Fixed module execution issues by running app modules with `python -m ...` instead of file paths.
@@ -38,3 +40,10 @@ This file tracks bugs fixed in this project with short notes.
   - RFP drafting prompts now route to `RFP_FLOW` and generate enterprise-style responses without forcing PDF upload.
   - Upload UI is shown only for explicit upload requests and uploaded-document actions when no file exists.
   - Uploaded-document actions (`summarize/analyze uploaded ...`) route to `RFP_FLOW` once a file is present.
+
+### New Implementations
+
+- Added Mermaid graph flow support for architecture documentation:
+  - Added export script at `app/graph/export_mermaid.py`.
+  - Generated graph source at `docs/graph_flow.mmd`.
+  - Added Mermaid visualization section in `README.md`.
