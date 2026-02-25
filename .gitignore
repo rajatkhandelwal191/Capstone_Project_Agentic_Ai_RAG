@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+
+# Generated runtime artifacts
+# app/db/database.db
+# app/rag/faiss_index/
+temp_uploads/
+
+# Optional: keep private/large source docs out of git
+kb_pdfs/
