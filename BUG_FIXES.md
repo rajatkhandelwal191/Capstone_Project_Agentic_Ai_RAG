@@ -33,6 +33,7 @@ This file tracks bugs fixed in this project with short notes.
   - Added request, routing, and flow lifecycle logs across UI/graph/agent layers.
 - Enhanced backend trace detail for easier debugging:
   - Added per-request IDs, node/agent dispatch logs, intent classifier reasoning, selected tool names, retriever metrics, and elapsed timing in terminal logs.
+  - Added assistant response preview logging in Streamlit so AI reply text appears in terminal logs.
 - Redesigned RFP vs Upload intent flow:
   - RFP drafting prompts now route to `RFP_FLOW` and generate enterprise-style responses without forcing PDF upload.
   - Upload UI is shown only for explicit upload requests and uploaded-document actions when no file exists.

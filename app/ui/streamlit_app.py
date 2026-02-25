@@ -20,6 +20,14 @@ def _state_get(state_obj, key, default=None):
         return state_obj.get(key, default)
     return getattr(state_obj, key, default)
 
+
+def _log_preview(text: str, max_chars: int = 280) -> str:
+    clean = " ".join((text or "").split())
+    if len(clean) <= max_chars:
+        return clean
+    return clean[:max_chars] + "..."
+
+
 st.title("Enterprise AI Assistant")
 
 if "messages" not in st.session_state:
@@ -73,6 +81,11 @@ if user_input:
     )
     st.session_state.awaiting_upload = _state_get(result, "needs_upload", False)
     assistant_response = _state_get(result, "response", "No response generated.")
+    logger.info(
+        "request_id=%s | Assistant response preview=%s",
+        request_id,
+        _log_preview(assistant_response),
+    )
     assistant_box.write(assistant_response)
 
     st.session_state.messages.append(
