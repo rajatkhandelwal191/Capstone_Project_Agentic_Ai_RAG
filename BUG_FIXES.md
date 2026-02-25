@@ -31,3 +31,5 @@ This file tracks bugs fixed in this project with short notes.
 - Fixed missing backend visibility in terminal while using Streamlit:
   - Added explicit stdout logger setup in `app/core/logger.py`.
   - Added request, routing, and flow lifecycle logs across UI/graph/agent layers.
+- Enhanced backend trace detail for easier debugging:
+  - Added per-request IDs, node/agent dispatch logs, intent classifier reasoning, selected tool names, retriever metrics, and elapsed timing in terminal logs.

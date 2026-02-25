@@ -1,6 +1,7 @@
 from langgraph.graph import StateGraph, END
 from app.graph.state import GraphState
 from app.graph.nodes import *
+from app.core.logger import logger
 
 def build_graph():
 
@@ -32,4 +33,7 @@ def build_graph():
     workflow.add_edge("rfp", END)
     workflow.add_edge("upload", END)
 
+    logger.info(
+        "Graph topology initialized | entry=supervisor | routes={RAG_FLOW:rag, TOOL_FLOW:tool, RFP_FLOW:rfp, UPLOAD_FLOW:upload}"
+    )
     return workflow.compile()
