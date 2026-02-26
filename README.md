@@ -1,5 +1,10 @@
 # Capstone Project Agentic AI RAG
 
+## Documentation
+
+- [Setup Guide](SETUP.md)
+- [End-to-End Architecture](ARCHITECTURE.md)
+
 ## Graph Flow (Mermaid)
 
 ```mermaid
