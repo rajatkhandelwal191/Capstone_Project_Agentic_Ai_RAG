@@ -52,6 +52,7 @@ class Settings:
     QDRANT_URL = str(_get("QDRANT_URL", "")).strip()
     QDRANT_API_KEY = str(_get("QDRANT_API_KEY", "")).strip()
     QDRANT_COLLECTION = str(_get("QDRANT_COLLECTION", "capstone_kb")).strip()
+    QDRANT_CONTENT_PAYLOAD_KEY = str(_get("QDRANT_CONTENT_PAYLOAD_KEY", "text")).strip()
 
     RAG_TOP_K = int(str(_get("RAG_TOP_K", "4")))
     LOCAL_FAISS_PATH = str(_get("LOCAL_FAISS_PATH", "app/rag/faiss_index"))

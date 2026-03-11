@@ -27,10 +27,12 @@ def _get_vector_store():
             client=client,
             collection_name=Settings.QDRANT_COLLECTION,
             embedding=embeddings,
+            content_payload_key=Settings.QDRANT_CONTENT_PAYLOAD_KEY,
         )
         logger.info(
-            "retriever=Qdrant | collection=%s | top_k=%s",
+            "retriever=Qdrant | collection=%s | content_key=%s | top_k=%s",
             Settings.QDRANT_COLLECTION,
+            Settings.QDRANT_CONTENT_PAYLOAD_KEY,
             Settings.RAG_TOP_K,
         )
         return _db

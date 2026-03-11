@@ -88,6 +88,7 @@ GROQ_MODEL="llama-3.1-8b-instant"
 QDRANT_URL="https://<your-cluster-url>"
 QDRANT_API_KEY="<your-qdrant-api-key>"
 QDRANT_COLLECTION="capstone_kb"
+QDRANT_CONTENT_PAYLOAD_KEY="text"
 RAG_TOP_K="4"
 SYNTHETIC_DATA_PATH="data/synthetic_dataset.jsonl"
 ```

@@ -287,6 +287,8 @@ def _build_points(chunks: list[Document], embeddings) -> list[qdrant_models.Poin
         payload = dict(metadata)
         payload["chunk_index"] = chunk_index
         payload["text"] = doc.page_content
+        payload["page_content"] = doc.page_content
+        payload["metadata"] = metadata
 
         points.append(
             qdrant_models.PointStruct(
