@@ -44,7 +44,7 @@ def _render_overview():
         st.markdown(
             """
 <div class="detail-card">
-  <h4>What You Built</h4>
+  <h4>What I Built</h4>
   <p>A multi-agent enterprise assistant with deterministic intent routing, retrieval-augmented generation, database tooling, and upload-aware proposal generation.</p>
 </div>
             """,
@@ -338,6 +338,7 @@ poetry run streamlit run app/ui/streamlit_app.py
 def render_implementation_dashboard(project_root: Path):
     st.title("Implementation Dashboard")
     _render_overview()
+    st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
     tab_flow, tab_langgraph, tab_models, tab_data, tab_config, tab_deploy = st.tabs(
         [
             "System Flow",

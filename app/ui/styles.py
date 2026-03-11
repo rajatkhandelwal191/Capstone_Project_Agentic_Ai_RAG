@@ -101,6 +101,54 @@ h1, h2, h3, h4, h5, h6, p, li, label, span, div {
   border-radius: 10px;
 }
 
+[data-testid="stButton"] > button,
+.stButton > button {
+  min-height: 48px;
+  padding: 0.62rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #f8fafc;
+  border: 1px solid rgba(34, 211, 238, 0.55);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  box-shadow: 0 6px 16px rgba(2, 6, 23, 0.4);
+}
+
+[data-testid="stButton"] > button:hover,
+.stButton > button:hover {
+  border-color: rgba(34, 211, 238, 0.95);
+  background: linear-gradient(135deg, #243447, #0f172a);
+  transform: translateY(-1px);
+}
+
+[data-testid="stButton"] > button:focus,
+.stButton > button:focus {
+  outline: 2px solid rgba(34, 211, 238, 0.9);
+  outline-offset: 1px;
+}
+
+.stTabs [role="tablist"] {
+  gap: 10px;
+}
+
+.stTabs [role="tab"] {
+  min-height: 44px;
+  padding: 0.4rem 0.95rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px 10px 0 0;
+  background: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stTabs [role="tab"][aria-selected="true"] {
+  border-color: rgba(34, 211, 238, 0.8);
+  color: #a5f3fc;
+  background: rgba(8, 47, 73, 0.56);
+}
+
 [data-testid="stMetric"] {
   background: var(--panel-2);
   border: 1px solid var(--border);
