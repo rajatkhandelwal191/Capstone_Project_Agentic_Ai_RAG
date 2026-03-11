@@ -6,6 +6,16 @@ import time
 llm = get_llm()
 
 
+def _friendly_llm_error(exc: Exception) -> str:
+    text = str(exc)
+    if "ResourceExhausted" in text or "429" in text or "quota" in text.lower():
+        return (
+            "Gemini API quota is exhausted (HTTP 429). "
+            "Please wait and retry, or switch to APP_ENV=local to use Ollama."
+        )
+    return "The language model is currently unavailable. Please retry shortly."
+
+
 def _read_pdf_text(file_path, max_chars=12000):
     if not file_path:
         return ""
@@ -88,7 +98,13 @@ User Request:
 {state.user_input}
 """
 
-    state.response = llm.invoke(prompt).content
+    try:
+        state.response = llm.invoke(prompt).content
+    except Exception as exc:
+        logger.exception("request_id=%s | agent=rfp_flow | llm_failed | error=%s", request_id, exc)
+        state.response = _friendly_llm_error(exc)
+        return state
+
     elapsed_ms = (time.perf_counter() - start) * 1000.0
     logger.info(
         "request_id=%s | agent=rfp_flow | done | response_chars=%s | elapsed_ms=%.2f",

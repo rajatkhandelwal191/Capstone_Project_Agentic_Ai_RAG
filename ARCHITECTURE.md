@@ -18,8 +18,9 @@ This document explains how the repository works end to end: from user question i
   - `rfp_flow.py`: Enterprise proposal generation path with optional uploaded document context.
 - `app/rag/`
   - `loaders.py`: loads PDFs from `kb_pdfs/`.
-  - `build_index.py`: chunks docs, embeds, builds FAISS index.
-  - `retriever.py`: runtime FAISS similarity search.
+  - `build_index.py`: local-mode chunking + FAISS build.
+  - `ingest_qdrant.py`: cloud-mode ingestion into Qdrant.
+  - `retriever.py`: runtime retrieval abstraction (FAISS local / Qdrant cloud).
 - `app/db/`
   - `init_db.py`: creates SQLite tables.
   - `seed_db.py`: inserts sample incidents and service requests.
@@ -28,8 +29,9 @@ This document explains how the repository works end to end: from user question i
 - `app/tools/local_tools.py`
   - Tool wrapper methods for open incidents/open service requests.
 - `app/core/`
-  - `config.py`: env-driven model config.
-  - `llm.py`: ChatOllama client creation.
+  - `config.py`: env-driven local/cloud config.
+  - `llm.py`: provider-aware LLM factory (Ollama or Gemini).
+  - `embeddings.py`: provider-aware embeddings factory.
   - `logger.py`: unified stdout logger format.
 - `app/prompts/`
   - `prompts.json`: base prompt templates (supervisor/rag/rfp).
@@ -94,7 +96,7 @@ File: `app/graph/graph.py`
 
 Files: `app/agents/rag_flow.py`, `app/rag/retriever.py`
 
-1. `query_rag(user_input)` runs FAISS similarity search (`k=4`).
+1. `query_rag(user_input)` runs similarity search using the configured backend.
 2. Retrieved chunk texts are concatenated as context.
 3. Prompt forces answer from context only.
 4. LLM returns final answer stored in `state.response`.
@@ -140,9 +142,9 @@ File: `app/ui/streamlit_app.py`
 3. Response preview is also written to terminal logs.
 4. Chat history is appended in `st.session_state.messages`.
 
-## 4. RAG Data Pipeline (Chunking + FAISS)
+## 4. RAG Data Pipeline (Local FAISS / Cloud Qdrant)
 
-### Offline/index-time flow
+### Offline/index-time flow (Local)
 
 Files: `app/rag/loaders.py`, `app/rag/build_index.py`
 
@@ -150,7 +152,7 @@ Files: `app/rag/loaders.py`, `app/rag/build_index.py`
 2. Chunk using `RecursiveCharacterTextSplitter`:
    - `chunk_size=1000`
    - `chunk_overlap=200`
-3. Generate embeddings using `OllamaEmbeddings(model="nomic-embed-text")`.
+3. Generate embeddings using configured local embedding model.
 4. Build FAISS vector store from chunks.
 5. Persist index to `app/rag/faiss_index/` (`index.faiss`, `index.pkl`).
 
@@ -158,7 +160,9 @@ Files: `app/rag/loaders.py`, `app/rag/build_index.py`
 
 File: `app/rag/retriever.py`
 
-1. Load persisted FAISS index on module import.
+1. Load backend at runtime:
+   - Local: persisted FAISS index.
+   - Cloud: Qdrant collection.
 2. On query, run `similarity_search(query, k=4)`.
 3. Return joined page-content text to RAG agent prompt.
 
@@ -185,15 +189,26 @@ Tables:
 File: `app/core/config.py`
 
 Environment variables:
-- `OLLAMA_MODEL` (default `llama3.2:latest`)
-- `EMBED_MODEL` (default `nomic-embed-text`)
+- `APP_ENV` (`local` or `cloud`)
+- Local mode:
+  - `OLLAMA_MODEL` (default `llama3.2:latest`)
+  - `EMBED_MODEL` (default `nomic-embed-text`)
+  - `LOCAL_FAISS_PATH`
+- Cloud mode:
+  - `GOOGLE_API_KEY` (or `GEMINI_API_KEY`)
+  - `GEMINI_CHAT_MODEL`
+  - `GEMINI_EMBED_MODEL`
+  - `QDRANT_URL`
+  - `QDRANT_API_KEY`
+  - `QDRANT_COLLECTION`
 - `TEMPERATURE` (default `0.2`)
 
 ### LLM creation
 
 File: `app/core/llm.py`
 
-- Uses `ChatOllama(model=Settings.MODEL, temperature=Settings.TEMPERATURE)`.
+- Local: uses `ChatOllama`.
+- Cloud: uses `ChatGoogleGenerativeAI`.
 
 ### Prompt sources
 
@@ -274,4 +289,5 @@ File: `app/graph/state.py`
 - Build DB schema: `poetry run python -m app.db.init_db`
 - Seed DB: `poetry run python -m app.db.seed_db`
 - Build FAISS index: `poetry run python -m app.rag.build_index`
+- Ingest cloud vectors into Qdrant: `poetry run python -m app.rag.ingest_qdrant`
 - Export Mermaid graph: `poetry run python -m app.graph.export_mermaid`

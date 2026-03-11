@@ -93,7 +93,24 @@ if user_input:
                 uploaded_file=st.session_state.uploaded_file
             )
 
-            result = graph.invoke(state)
+            try:
+                result = graph.invoke(state)
+            except Exception as exc:
+                logger.exception("request_id=%s | Graph invocation failed | error=%s", request_id, exc)
+                error_text = str(exc)
+                if "ResourceExhausted" in error_text or "429" in error_text or "quota" in error_text.lower():
+                    result = GraphState(
+                        response=(
+                            "Gemini quota exceeded (429). Please retry later, add billing/quota, "
+                            "or set APP_ENV=local to use Ollama."
+                        ),
+                        needs_upload=False,
+                    )
+                else:
+                    result = GraphState(
+                        response="The request failed due to a runtime error. Check logs and retry.",
+                        needs_upload=False,
+                    )
             elapsed_ms = (time.perf_counter() - start) * 1000.0
 
     logger.info(

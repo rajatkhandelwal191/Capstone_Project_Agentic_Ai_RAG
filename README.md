@@ -4,6 +4,27 @@
 
 - [Setup Guide](SETUP.md)
 - [End-to-End Architecture](ARCHITECTURE.md)
+- [Cloud Deployment + Qdrant Ingestion](docs/streamlit_cloud_qdrant.md)
+
+## Runtime Modes
+
+- `APP_ENV=local`
+  - LLM: Ollama (`OLLAMA_MODEL`)
+  - Embeddings: Ollama (`EMBED_MODEL`)
+  - Vector store: local FAISS (`LOCAL_FAISS_PATH`)
+- `APP_ENV=cloud`
+  - LLM: Gemini (`GEMINI_CHAT_MODEL`, `GOOGLE_API_KEY`)
+  - Embeddings: Gemini (`GEMINI_EMBED_MODEL`)
+  - Vector store: Qdrant Cloud (`QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION`)
+
+Use `.env.example` as the config template.
+
+Cloud ingestion (`python -m app.rag.ingest_qdrant`) now includes:
+- PDFs (`kb_pdfs/`)
+- synthetic dataset (`SYNTHETIC_DATA_PATH`)
+- SQLite seed data (`incidents`, `service_requests`)
+
+It uses deterministic point IDs for true upsert on reruns (no duplicates).
 
 ## Graph Flow (Mermaid)
 

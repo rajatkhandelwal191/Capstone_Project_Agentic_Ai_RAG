@@ -25,3 +25,4 @@ temp_uploads/
 
 # Optional: keep private/large source docs out of git
 kb_pdfs/
+data/synthetic_dataset.jsonl

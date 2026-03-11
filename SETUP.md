@@ -18,7 +18,7 @@ cd Capstone_Project_Agentic_Ai_RAG
 ## 3. Install Python Dependencies (Poetry)
 
 ```powershell
-poetry install
+poetry install --no-root
 ```
 
 ## 4. Configure Environment Variables
@@ -26,6 +26,7 @@ poetry install
 Create `.env` in project root:
 
 ```env
+APP_ENV=local
 OLLAMA_MODEL=llama3.2:latest
 EMBED_MODEL=nomic-embed-text
 TEMPERATURE=0.2
@@ -145,3 +146,29 @@ python -m py_compile app\ui\streamlit_app.py
   - Ensure PDFs exist in `kb_pdfs/` and rebuild index.
 - Tool flow returns empty:
   - Re-run DB init + seed commands.
+
+## 12. Cloud Deployment Mode (Gemini + Qdrant)
+
+Use this when deploying to Streamlit Community Cloud:
+
+1. Set `APP_ENV=cloud`
+2. Add cloud secrets:
+   - `GOOGLE_API_KEY`
+   - `GEMINI_CHAT_MODEL` (for example `gemini-2.0-flash`)
+   - `GEMINI_EMBED_MODEL` (for example `gemini-embedding-001`)
+   - `QDRANT_URL`
+   - `QDRANT_API_KEY`
+   - `QDRANT_COLLECTION`
+3. Ingest vectors into Qdrant once:
+
+```powershell
+poetry run python -m app.rag.ingest_qdrant
+```
+
+This ingestion includes:
+- PDFs in `kb_pdfs/`
+- synthetic dataset from `SYNTHETIC_DATA_PATH`
+- SQLite records from `incidents` and `service_requests`
+
+Detailed guide:
+- `docs/streamlit_cloud_qdrant.md`

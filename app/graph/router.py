@@ -128,7 +128,12 @@ User: {user_input}
 HasUploadedFile: {"yes" if has_uploaded_file else "no"}
 """
 
-    result = llm.invoke(prompt).content
+    try:
+        result = llm.invoke(prompt).content
+    except Exception as exc:
+        logger.exception("Intent classification LLM fallback failed | error=%s", exc)
+        return "RAG_FLOW"
+
     normalized = _normalize_label(result)
     logger.info(
         "Intent classified by LLM | raw=%s | normalized=%s",
