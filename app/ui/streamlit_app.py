@@ -10,9 +10,16 @@ if str(PROJECT_ROOT) not in sys.path:
 import streamlit as st
 from app.graph.graph import build_graph
 from app.graph.state import GraphState
+from app.core.config import Settings
 from app.core.logger import logger
 
 graph = build_graph()
+logger.info(
+    "UI startup config | app_env=%s | use_cloud=%s | qdrant_url_set=%s",
+    Settings.APP_ENV,
+    Settings.USE_CLOUD,
+    bool(Settings.QDRANT_URL),
+)
 
 
 def _state_get(state_obj, key, default=None):
