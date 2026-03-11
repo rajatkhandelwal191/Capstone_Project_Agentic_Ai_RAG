@@ -48,11 +48,18 @@ if "uploaded_file" not in st.session_state:
     st.session_state.uploaded_file = None
 if "show_faq" not in st.session_state:
     st.session_state.show_faq = False
+if "show_question_guide" not in st.session_state:
+    st.session_state.show_question_guide = False
+if "pending_user_input" not in st.session_state:
+    st.session_state.pending_user_input = None
 
-faq_col_left, faq_col_right = st.columns([8, 1])
-with faq_col_right:
+top_col_left, top_col_faq, top_col_questions = st.columns([6, 1, 2])
+with top_col_faq:
     if st.button("FAQ"):
         st.session_state.show_faq = not st.session_state.show_faq
+with top_col_questions:
+    if st.button("What To Ask"):
+        st.session_state.show_question_guide = not st.session_state.show_question_guide
 
 if st.session_state.show_faq:
     st.info(
@@ -72,10 +79,67 @@ if st.session_state.show_faq:
 """
     )
 
+if st.session_state.show_question_guide:
+    st.markdown("### RAG FLOW (Knowledge Base)")
+    st.caption("Click any question to send it.")
+    rag_questions = [
+        "What is our SLA policy?",
+        "What uptime do we guarantee?",
+        "Explain cloud architecture capabilities.",
+        "What is our incident escalation process?",
+        "How do we handle high severity incidents?",
+        "What deployment strategy do we use?",
+    ]
+    for idx, question in enumerate(rag_questions):
+        if st.button(question, key=f"rag_sample_q_{idx}", use_container_width=True):
+            st.session_state.pending_user_input = question
+
+    st.markdown("### TOOL FLOW (Database)")
+    tool_questions = [
+        "Show open incidents",
+        "List P1 incidents",
+        "Any network team incidents?",
+        "Show all service requests",
+        "Show pending requests",
+    ]
+    for idx, question in enumerate(tool_questions):
+        if st.button(question, key=f"tool_sample_q_{idx}", use_container_width=True):
+            st.session_state.pending_user_input = question
+    st.caption("Expected: structured data output with IDs like INCxxxx / RITMxxxx")
+
+    st.markdown("### RFP FLOW")
+    rfp_questions = [
+        "Draft proposal for cloud migration",
+        "Create bid response for high availability system",
+        "Write RFP response for scalable architecture",
+        "Summarize this client requirement and propose solution",
+    ]
+    for idx, question in enumerate(rfp_questions):
+        if st.button(question, key=f"rfp_sample_q_{idx}", use_container_width=True):
+            st.session_state.pending_user_input = question
+    st.caption("Expected: enterprise-style proposal text")
+
+    st.markdown("### UPLOAD FLOW")
+    upload_questions = [
+        "I want to upload an RFP",
+        "Summarize my uploaded document",
+        "Analyze this client proposal",
+    ]
+    for idx, question in enumerate(upload_questions):
+        if st.button(question, key=f"upload_sample_q_{idx}", use_container_width=True):
+            st.session_state.pending_user_input = question
+
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
-user_input = st.chat_input("Ask something...")
+typed_input = st.chat_input("Ask something...")
+if typed_input:
+    user_input = typed_input
+elif st.session_state.pending_user_input:
+    user_input = st.session_state.pending_user_input
+    st.session_state.pending_user_input = None
+else:
+    user_input = None
 
 if user_input:
     request_id = str(uuid4())[:8]
