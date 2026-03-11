@@ -38,8 +38,11 @@ def _as_bool(name: str, default: str = "false") -> bool:
 class Settings:
     APP_ENV = str(_get("APP_ENV", "local")).strip().lower()
     USE_CLOUD = APP_ENV == "cloud"
+    LLM_PROVIDER = str(_get("LLM_PROVIDER", "auto")).strip().lower()
 
     OLLAMA_MODEL = str(_get("OLLAMA_MODEL", "llama3.2:latest"))
+    GROQ_API_KEY = str(_get("GROQ_API_KEY", "")).strip()
+    GROQ_MODEL = str(_get("GROQ_MODEL", "llama-3.1-8b-instant"))
     LOCAL_EMBED_MODEL = str(_get("EMBED_MODEL", "nomic-embed-text"))
 
     GOOGLE_API_KEY = _get("GOOGLE_API_KEY") or _get("GEMINI_API_KEY")
@@ -74,3 +77,14 @@ class Settings:
             raise ValueError("Missing QDRANT_URL for APP_ENV=cloud.")
         if not cls.QDRANT_API_KEY:
             raise ValueError("Missing QDRANT_API_KEY for APP_ENV=cloud.")
+
+    @classmethod
+    def ensure_groq_config(cls):
+        if not cls.GROQ_API_KEY:
+            raise ValueError("Missing GROQ_API_KEY for LLM_PROVIDER=groq.")
+
+    @classmethod
+    def resolved_llm_provider(cls) -> str:
+        if cls.LLM_PROVIDER == "auto":
+            return "gemini" if cls.USE_CLOUD else "ollama"
+        return cls.LLM_PROVIDER

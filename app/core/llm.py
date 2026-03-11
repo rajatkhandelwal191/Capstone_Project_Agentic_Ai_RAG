@@ -2,7 +2,9 @@ from app.core.config import Settings
 
 
 def get_llm():
-    if Settings.USE_CLOUD:
+    provider = Settings.resolved_llm_provider()
+
+    if provider == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         Settings.ensure_cloud_llm_config()
@@ -12,9 +14,25 @@ def get_llm():
             google_api_key=Settings.GOOGLE_API_KEY,
         )
 
-    from langchain_ollama import ChatOllama
+    if provider == "groq":
+        from langchain_groq import ChatGroq
 
-    return ChatOllama(
-        model=Settings.OLLAMA_MODEL,
-        temperature=Settings.TEMPERATURE,
+        Settings.ensure_groq_config()
+        return ChatGroq(
+            model=Settings.GROQ_MODEL,
+            temperature=Settings.TEMPERATURE,
+            groq_api_key=Settings.GROQ_API_KEY,
+        )
+
+    if provider == "ollama":
+        from langchain_ollama import ChatOllama
+
+        return ChatOllama(
+            model=Settings.OLLAMA_MODEL,
+            temperature=Settings.TEMPERATURE,
+        )
+
+    raise ValueError(
+        f"Unsupported LLM provider '{provider}'. "
+        "Use one of: auto, gemini, groq, ollama."
     )

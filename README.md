@@ -9,11 +9,13 @@
 ## Runtime Modes
 
 - `APP_ENV=local`
-  - LLM: Ollama (`OLLAMA_MODEL`)
+  - LLM: default `ollama` (or override with `LLM_PROVIDER`)
   - Embeddings: Ollama (`EMBED_MODEL`)
   - Vector store: local FAISS (`LOCAL_FAISS_PATH`)
 - `APP_ENV=cloud`
-  - LLM: Gemini (`GEMINI_CHAT_MODEL`, `GOOGLE_API_KEY`)
+  - LLM: choose with `LLM_PROVIDER`
+    - `gemini`: `GEMINI_CHAT_MODEL`, `GOOGLE_API_KEY`
+    - `groq`: `GROQ_MODEL`, `GROQ_API_KEY`
   - Embeddings: Gemini (`GEMINI_EMBED_MODEL`)
   - Vector store: Qdrant Cloud (`QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION`)
 

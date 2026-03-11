@@ -30,7 +30,7 @@ This document explains how the repository works end to end: from user question i
   - Tool wrapper methods for open incidents/open service requests.
 - `app/core/`
   - `config.py`: env-driven local/cloud config.
-  - `llm.py`: provider-aware LLM factory (Ollama or Gemini).
+  - `llm.py`: provider-aware LLM factory (Ollama, Gemini, or Groq).
   - `embeddings.py`: provider-aware embeddings factory.
   - `logger.py`: unified stdout logger format.
 - `app/prompts/`
@@ -190,6 +190,7 @@ File: `app/core/config.py`
 
 Environment variables:
 - `APP_ENV` (`local` or `cloud`)
+- `LLM_PROVIDER` (`auto`, `ollama`, `gemini`, `groq`)
 - Local mode:
   - `OLLAMA_MODEL` (default `llama3.2:latest`)
   - `EMBED_MODEL` (default `nomic-embed-text`)
@@ -198,6 +199,8 @@ Environment variables:
   - `GOOGLE_API_KEY` (or `GEMINI_API_KEY`)
   - `GEMINI_CHAT_MODEL`
   - `GEMINI_EMBED_MODEL`
+  - `GROQ_API_KEY`
+  - `GROQ_MODEL`
   - `QDRANT_URL`
   - `QDRANT_API_KEY`
   - `QDRANT_COLLECTION`
@@ -207,8 +210,10 @@ Environment variables:
 
 File: `app/core/llm.py`
 
-- Local: uses `ChatOllama`.
-- Cloud: uses `ChatGoogleGenerativeAI`.
+- Provider is selected by `LLM_PROVIDER`:
+  - `ollama`: `ChatOllama`
+  - `gemini`: `ChatGoogleGenerativeAI`
+  - `groq`: `ChatGroq`
 
 ### Prompt sources
 

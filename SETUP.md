@@ -147,15 +147,18 @@ python -m py_compile app\ui\streamlit_app.py
 - Tool flow returns empty:
   - Re-run DB init + seed commands.
 
-## 12. Cloud Deployment Mode (Gemini + Qdrant)
+## 12. Cloud Deployment Mode (Gemini/Groq + Qdrant)
 
 Use this when deploying to Streamlit Community Cloud:
 
 1. Set `APP_ENV=cloud`
 2. Add cloud secrets:
+   - `LLM_PROVIDER` (`gemini` or `groq`, default `auto`)
    - `GOOGLE_API_KEY`
    - `GEMINI_CHAT_MODEL` (for example `gemini-2.0-flash`)
    - `GEMINI_EMBED_MODEL` (for example `gemini-embedding-001`)
+   - `GROQ_API_KEY`
+   - `GROQ_MODEL` (for example `llama-3.1-8b-instant`)
    - `QDRANT_URL`
    - `QDRANT_API_KEY`
    - `QDRANT_COLLECTION`

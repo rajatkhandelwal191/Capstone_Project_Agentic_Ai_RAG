@@ -1,6 +1,6 @@
-# Streamlit Cloud + Gemini + Qdrant
+# Streamlit Cloud + Gemini/Groq + Qdrant
 
-This guide explains how to deploy the app for free on Streamlit Community Cloud using Gemini and Qdrant Cloud.
+This guide explains how to deploy the app for free on Streamlit Community Cloud using Gemini or Groq for chat and Qdrant Cloud for vectors.
 
 ## 1. Security First
 
@@ -15,7 +15,10 @@ The app now supports two modes through `APP_ENV`:
 - `APP_ENV=local`:
   - uses local `Ollama` + local `FAISS`.
 - `APP_ENV=cloud`:
-  - uses `Gemini` + `Qdrant Cloud`.
+  - uses `Qdrant Cloud` for vectors
+  - LLM selected by `LLM_PROVIDER`:
+    - `gemini` (default in cloud when `LLM_PROVIDER=auto`)
+    - `groq`
 
 See `.env.example` for all variables.
 
@@ -49,7 +52,7 @@ Sample file:
 
 ## 5. One-Time Qdrant Ingestion
 
-Set cloud env vars (`APP_ENV=cloud`, Gemini and Qdrant keys), then run:
+Set cloud env vars (`APP_ENV=cloud`, Qdrant keys, and embedding/LLM keys), then run:
 
 ```powershell
 poetry run python -m app.rag.ingest_qdrant
@@ -76,9 +79,12 @@ Deterministic IDs are generated from source record keys + chunk index so reruns 
 
 ```toml
 APP_ENV="cloud"
-GOOGLE_API_KEY="your_rotated_key"
+LLM_PROVIDER="gemini"
+GOOGLE_API_KEY="your_rotated_gemini_key"
 GEMINI_CHAT_MODEL="gemini-2.0-flash"
 GEMINI_EMBED_MODEL="gemini-embedding-001"
+GROQ_API_KEY=""
+GROQ_MODEL="llama-3.1-8b-instant"
 QDRANT_URL="https://<your-cluster-url>"
 QDRANT_API_KEY="<your-qdrant-api-key>"
 QDRANT_COLLECTION="capstone_kb"
@@ -87,6 +93,16 @@ SYNTHETIC_DATA_PATH="data/synthetic_dataset.jsonl"
 ```
 
 5. Redeploy.
+
+To switch to Groq for responses, keep all Qdrant settings the same and update:
+
+```toml
+LLM_PROVIDER="groq"
+GROQ_API_KEY="your_rotated_groq_key"
+GROQ_MODEL="llama-3.1-8b-instant"
+```
+
+Note: RAG embedding/retrieval still uses Gemini embeddings in cloud mode, so `GOOGLE_API_KEY` + `GEMINI_EMBED_MODEL` should remain configured.
 
 ## 7. Local Development
 

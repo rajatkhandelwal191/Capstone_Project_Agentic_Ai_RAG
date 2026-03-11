@@ -15,9 +15,10 @@ from app.core.logger import logger
 
 graph = build_graph()
 logger.info(
-    "UI startup config | app_env=%s | use_cloud=%s | qdrant_url_set=%s",
+    "UI startup config | app_env=%s | use_cloud=%s | llm_provider=%s | qdrant_url_set=%s",
     Settings.APP_ENV,
     Settings.USE_CLOUD,
+    Settings.resolved_llm_provider(),
     bool(Settings.QDRANT_URL),
 )
 
