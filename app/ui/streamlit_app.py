@@ -38,6 +38,31 @@ if "awaiting_upload" not in st.session_state:
     st.session_state.awaiting_upload = False
 if "uploaded_file" not in st.session_state:
     st.session_state.uploaded_file = None
+if "show_faq" not in st.session_state:
+    st.session_state.show_faq = False
+
+faq_col_left, faq_col_right = st.columns([8, 1])
+with faq_col_right:
+    if st.button("FAQ"):
+        st.session_state.show_faq = not st.session_state.show_faq
+
+if st.session_state.show_faq:
+    st.info(
+        """
+**How to use this chatbot**
+- Ask normal questions to get knowledge-base answers and guidance.
+- Ask incident/request-style questions (for example: open incidents or service request status) to trigger tool-based responses.
+- Ask RFP/proposal questions directly, or upload an RFP PDF when prompted and then ask follow-up questions about that document.
+
+**What this chatbot does**
+- Routes your message to the right flow: RAG knowledge answers, operational tool lookups, or RFP response support.
+- Accepts PDF uploads for document-driven proposal and analysis tasks.
+
+**How it responds**
+- Provides direct, context-aware text answers in the chat.
+- If your request needs a file first, it asks for upload and continues once the PDF is provided.
+"""
+    )
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
